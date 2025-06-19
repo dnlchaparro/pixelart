@@ -16,6 +16,8 @@ type PixelGridProps = {
 
 export interface PixelGridRef {
   clear: () => void;
+  loadPixelData: (pixelData: string[][]) => void;
+  downloadImage: () => void;
 }
 
 // Utility: Convert rgb string to hsl
@@ -120,6 +122,65 @@ const PixelGrid = forwardRef<PixelGridRef, PixelGridProps>(
             cell.style.backgroundColor = "";
           }
         }
+      },
+      loadPixelData: (pixelData: string[][]) => {
+        if (gridRef.current) {
+          const cells = gridRef.current.children;
+          for (let i = 0; i < cells.length; i++) {
+            const cell = cells[i] as HTMLElement;
+            const x = i % gridSize;
+            const y = Math.floor(i / gridSize);
+            const color = pixelData[y][x];
+            cell.style.backgroundColor = color;
+          }
+        }
+      },
+      downloadImage: () => {
+        if (!gridRef.current) return;
+
+        // Create a canvas to draw the pixel art
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        // Set canvas size - use a higher resolution for better quality
+        const pixelSize = 20; // Each pixel will be 20x20 pixels in the final image
+        canvas.width = gridSize * pixelSize;
+        canvas.height = gridSize * pixelSize;
+
+        // Fill with transparent background
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw each pixel
+        const cells = gridRef.current.children;
+        for (let i = 0; i < cells.length; i++) {
+          const cell = cells[i] as HTMLElement;
+          const x = i % gridSize;
+          const y = Math.floor(i / gridSize);
+
+          // Get the inline background color (only pixels we've explicitly set)
+          const inlineStyle = cell.style.backgroundColor;
+
+          // Only draw if there's an explicitly set background color
+          if (inlineStyle && inlineStyle.trim() !== "") {
+            ctx.fillStyle = inlineStyle;
+            ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+          }
+        }
+
+        // Convert canvas to blob and download
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `pixel-art-${gridSize}x${gridSize}-${Date.now()}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        }, "image/png");
       },
     }));
 

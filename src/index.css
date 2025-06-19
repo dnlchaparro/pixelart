@@ -61,8 +61,40 @@ body {
   --panel: var(--color-red-500);
 }
 
+.bit-border.red:hover {
+  --panel: var(--color-red-800);
+}
+
 .bit-border.blue {
   --panel: var(--color-blue-500);
+}
+
+.bit-border.blue:hover {
+  --panel: var(--color-blue-800);
+}
+
+.bit-border.green {
+  --panel: var(--color-green-500);
+}
+
+.bit-border.green:hover {
+  --panel: var(--color-green-800);
+}
+
+.bit-border.purple {
+  --panel: var(--color-purple-500);
+}
+
+.bit-border.purple:hover {
+  --panel: var(--color-purple-800);
+}
+
+.bit-border.orange {
+  --panel: var(--color-orange-500);
+}
+
+.bit-border.orange:hover {
+  --panel: var(--color-orange-800);
 }
 
 .bit-border.active {
